@@ -1,6 +1,5 @@
 package com.example.ayush.auidoapp;
 
-import android.annotation.SuppressLint;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
@@ -40,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         mediaPlayer = MediaPlayer.create(this, R.raw.car);
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        maxProgress = mediaPlayer.getDuration();
 
         volumeControl = (SeekBar) findViewById(R.id.volumeSeekBar);
         volumeControl.setMax(maxVol);
@@ -62,13 +60,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        maxProgress = mediaPlayer.getDuration();
         scrubControl = (SeekBar) findViewById(R.id.progressSeekBar);
         scrubControl.setMax(maxProgress);
         scrubControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 Log.i("P_Seekbar Changed", Integer.toString(i));
-                mediaPlayer.seekTo(i);
+
             }
 
             @Override
@@ -79,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mediaPlayer.start();
+                mediaPlayer.seekTo(scrubControl.getProgress());
             }
         });
         new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
                 currProgress = mediaPlayer.getCurrentPosition();
                 scrubControl.setProgress(currProgress, true);
                 currVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                volumeControl.setProgress(currVol, true);
+                volumeControl.setProgress(currVol);
             }
-        },0, 250);
+        },0, 100);
     }
 }
